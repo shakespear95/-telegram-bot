@@ -48,7 +48,11 @@ _BASE_PROMPT = os.environ.get(
     "fetch the full details, then offer to generate a tailored CV and cover letter. "
     "Use the candidate profile below to generate both documents without asking for "
     "information already known. After generating the CV, always ask if they also want "
-    "a cover letter.",
+    "a cover letter.\n\n"
+    "CRITICAL: If the search_jobs tool returns an error or empty results, tell the "
+    "user plainly that the search failed and suggest they try again or search manually "
+    "on LinkedIn, StepStone, or Indeed. NEVER invent, fabricate, or hallucinate job "
+    "listings, company names, or market information when search tools fail.",
 )
 SYSTEM_PROMPT = f"{_BASE_PROMPT}\n\n{PROFILE}"
 

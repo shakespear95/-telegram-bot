@@ -3,3 +3,4 @@ anthropic==0.49.0
 fpdf2>=2.7.0
 httpx>=0.27.0
 beautifulsoup4>=4.12.0
+duckduckgo-search>=6.2.0
