@@ -7,6 +7,8 @@ tailored CVs for any role without asking for details already known.
 PROFILE = """
 === CANDIDATE PROFILE: SHAKESPEAR TAKUDZWA SAMU ===
 
+EMAIL: takudzwasamu@proton.me
+PHONE: +41 77 261 04 68
 LOCATION: St. Gallen, Switzerland
 OPEN TO RELOCATION: Yes (e.g. Lisbon, Portugal; other locations as specified)
 
@@ -182,8 +184,8 @@ Strategy 4 — Scale Emphasis: Highlight relevant scale aspects
    keywords and the company's terminology.
 5. For experience bullets, lead with highest-confidence matches first.
 6. Always include Education, Certifications, Publications, and Languages.
-7. Contact details (phone, email) should be asked from the user if not
-   provided — never invent them.
+7. Always use the contact details from the profile: email takudzwasamu@proton.me,
+   phone +41 77 261 04 68, location St. Gallen, Switzerland. Never ask for these.
 8. Keep the CV to 2 pages maximum.
 9. Use strong action verbs and quantify achievements where possible.
 10. When presenting the CV plan to the user, mention your confidence
@@ -208,4 +210,69 @@ For unaddressed requirements:
 - Suggest emphasizing learning ability and adjacent skills
 - Never fabricate or exaggerate experience to fill gaps
 - Be transparent with the user about what's missing
+
+=== DACH LEBENSLAUF INSTRUCTIONS ===
+
+Use generate_dach_cv (not generate_cv_pdf) when the role is at a German or
+Austrian company, or the user explicitly asks for a German-style CV.
+
+Personal data to always include:
+- DOB: ask the user — never invent it
+- Nationality: Zimbabwean
+- Marital status: ask the user if unknown, default to omitting
+
+Language levels (CEFR):
+- Englisch: C2 (Muttersprache / bilingual)
+- Shona: Muttersprache
+- Chinesisch (Mandarin): B1
+- Deutsch: B1
+
+The experience and education layout uses a date column on the left (32mm)
+and content on the right — dates as "Mai 2024 – heute" style.
+
+The photo (photo.jpeg in the bot directory) is automatically included.
+
+=== COVER LETTER GENERATION INSTRUCTIONS ===
+
+CORE PRINCIPLE: A cover letter supplements the CV — it explains motivation,
+bridges gaps, and shows personality. Never repeat CV bullet points verbatim;
+instead narrate the story behind them.
+
+STRUCTURE (4 paragraphs):
+
+1. OPENING / HOOK
+   - Reference the exact role title and company name
+   - Lead with the strongest alignment point (not "I am applying for…")
+   - One compelling sentence about why this role excites Shakespear
+   Example opener: "With five years of enterprise IT support across telecoms,
+   consulting, and multinational clients, I am drawn to [Company]'s [role]
+   because…"
+
+2. WHY THIS COMPANY / ROLE
+   - Demonstrate knowledge of the company (industry, products, culture, mission)
+   - Connect Shakespear's background to what the company specifically needs
+   - Mention the company's terminology and values where possible
+
+3. KEY QUALIFICATIONS & FIT
+   - Highlight 2-3 specific achievements from the profile that map directly
+     to the JD's must-have requirements
+   - Use numbers and outcomes where possible (30+ tickets/day, 4 client sites)
+   - Address any significant gaps proactively with a learning/adjacent angle
+
+4. CLOSING / CALL TO ACTION
+   - Express enthusiasm for discussing fit further
+   - Reference availability for an interview
+   - Thank them for their time
+   - Tone: confident but not arrogant
+
+TONE GUIDELINES:
+- Professional but warm — avoid stiff corporate language
+- Active voice throughout
+- No clichés: "passionate", "team player", "go-getter", "think outside the box"
+- Keep total length to 3-4 short paragraphs (fits on one page)
+- Tailor language to the country/culture (Swiss companies: precise, formal;
+  UK: slightly warmer; US: confident and direct)
+
+DATE: Use today's date (2026-06-13) formatted as "13 June 2026" unless the
+user provides a different date.
 """.strip()

@@ -13,7 +13,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from cv_generator import generate_cv_pdf
+from cv_generator import generate_cover_letter_pdf, generate_cv_pdf, generate_dach_cv_pdf
 from job_search import execute_search, execute_get_details
 from profile import PROFILE
 
@@ -36,11 +36,19 @@ _BASE_PROMPT = os.environ.get(
     "2. GET DETAILS about a specific job posting using the get_job_details tool — "
     "fetch the full description from any job URL.\n"
     "3. GENERATE tailored CV/resume PDFs using the generate_cv_pdf tool — "
-    "customised for the specific job the user wants to apply to.\n\n"
+    "customised for the specific job the user wants to apply to.\n"
+    "4. GENERATE tailored cover letters as PDFs using the generate_cover_letter tool — "
+    "write a professional cover letter addressed to the company for the specific role.\n"
+    "5. GENERATE a DACH-format Lebenslauf (Germany/Austria/Switzerland) using the "
+    "generate_dach_cv tool — includes photo, personal data block, CEFR language "
+    "levels, and signature line. Use this when the user applies to German/Austrian "
+    "companies or explicitly asks for a German CV.\n\n"
     "WORKFLOW: When the user wants to apply, first search for jobs, present the "
     "results as a numbered list with company, title, and link. When they pick one, "
-    "fetch the full details, then offer to generate a tailored CV. Use the candidate "
-    "profile below to generate CVs without asking for information already known.",
+    "fetch the full details, then offer to generate a tailored CV and cover letter. "
+    "Use the candidate profile below to generate both documents without asking for "
+    "information already known. After generating the CV, always ask if they also want "
+    "a cover letter.",
 )
 SYSTEM_PROMPT = f"{_BASE_PROMPT}\n\n{PROFILE}"
 
@@ -188,6 +196,154 @@ TOOLS = [
             "required": ["url"],
         },
     },
+    {
+        "name": "generate_cover_letter",
+        "description": (
+            "Generate a professional cover letter as a PDF document. "
+            "Use this when the user asks for a cover letter, application letter, "
+            "or motivational letter for a specific job. "
+            "Compose compelling, tailored paragraphs based on the candidate's "
+            "profile and the job description before calling this tool."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Full name of the applicant",
+                },
+                "contact": {
+                    "type": "object",
+                    "properties": {
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "location": {"type": "string"},
+                        "linkedin": {"type": "string"},
+                    },
+                },
+                "date": {
+                    "type": "string",
+                    "description": "Date of the letter (e.g. '13 June 2026')",
+                },
+                "company_name": {
+                    "type": "string",
+                    "description": "Name of the company being applied to",
+                },
+                "hiring_manager": {
+                    "type": "string",
+                    "description": (
+                        "Name or title to address the letter to "
+                        "(e.g. 'Hiring Manager', 'Ms. Schmidt'). "
+                        "Default to 'Hiring Manager' if unknown."
+                    ),
+                },
+                "job_title": {
+                    "type": "string",
+                    "description": "Title of the role being applied for",
+                },
+                "paragraphs": {
+                    "type": "array",
+                    "description": (
+                        "Body paragraphs of the cover letter in order: "
+                        "opening/hook, why this role/company, "
+                        "key qualifications and fit, closing/call-to-action. "
+                        "Each element is one paragraph as a plain string."
+                    ),
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                },
+            },
+            "required": ["name", "job_title", "paragraphs"],
+        },
+    },
+    {
+        "name": "generate_dach_cv",
+        "description": (
+            "Generate a DACH-format Lebenslauf PDF for Germany, Austria, or Switzerland. "
+            "Use this instead of generate_cv_pdf when the role is at a German or Austrian "
+            "company, or when the user asks for a German-style CV. "
+            "Includes professional photo, personal data block, CEFR language levels, "
+            "date-column layout, and signature line."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Full name of the applicant"},
+                "contact": {
+                    "type": "object",
+                    "properties": {
+                        "email": {"type": "string"},
+                        "phone": {"type": "string"},
+                        "location": {"type": "string"},
+                        "linkedin": {"type": "string"},
+                    },
+                },
+                "personal": {
+                    "type": "object",
+                    "description": "Personal data block standard in DACH CVs",
+                    "properties": {
+                        "dob": {"type": "string", "description": "Date of birth (e.g. '12. März 1995')"},
+                        "nationality": {"type": "string", "description": "e.g. 'Zimbabwean'"},
+                        "marital_status": {"type": "string", "description": "e.g. 'ledig' (single)"},
+                    },
+                },
+                "summary": {"type": "string", "description": "Short professional profile (Profil)"},
+                "experience": {
+                    "type": "array",
+                    "description": "Work experience, most recent first",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string"},
+                            "company": {"type": "string"},
+                            "dates": {"type": "string"},
+                            "location": {"type": "string"},
+                            "highlights": {"type": "array", "items": {"type": "string"}},
+                        },
+                        "required": ["title", "company"],
+                    },
+                },
+                "education": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "degree": {"type": "string"},
+                            "institution": {"type": "string"},
+                            "dates": {"type": "string"},
+                            "details": {"type": "string"},
+                        },
+                        "required": ["degree", "institution"],
+                    },
+                },
+                "skills": {"type": "array", "items": {"type": "string"}},
+                "languages": {
+                    "type": "array",
+                    "description": "Languages with CEFR level",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "language": {"type": "string", "description": "e.g. 'Deutsch'"},
+                            "level": {"type": "string", "description": "e.g. 'B1' or 'Muttersprache'"},
+                        },
+                        "required": ["language", "level"],
+                    },
+                },
+                "sections": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string"},
+                            "items": {"type": "array", "items": {"type": "string"}},
+                        },
+                        "required": ["title", "items"],
+                    },
+                },
+            },
+            "required": ["name"],
+        },
+    },
 ]
 
 
@@ -229,6 +385,12 @@ def _execute_tool(name: str, tool_input: dict) -> tuple[str, bytes | None, str |
     if name == "generate_cv_pdf":
         pdf_bytes, filename = generate_cv_pdf(tool_input)
         return "PDF generated successfully.", pdf_bytes, filename
+    if name == "generate_cover_letter":
+        pdf_bytes, filename = generate_cover_letter_pdf(tool_input)
+        return "Cover letter PDF generated successfully.", pdf_bytes, filename
+    if name == "generate_dach_cv":
+        pdf_bytes, filename = generate_dach_cv_pdf(tool_input)
+        return "DACH Lebenslauf PDF generated successfully.", pdf_bytes, filename
     if name == "search_jobs":
         return execute_search(tool_input), None, None
     if name == "get_job_details":
